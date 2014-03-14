@@ -41,7 +41,6 @@ public class MainActivity extends Activity
 	protected void onDestroy()
 	{
 		Log.d("FlappyPixel","onDestroy started");
-		msv.hs.write();
 		Log.d("FlappyPixel","onDestroy ended");
 		super.onDestroy();
 	}

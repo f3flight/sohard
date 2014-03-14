@@ -51,7 +51,9 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	//Gate gate1;
 	//Gate gate2;
 	GateList gateList;
-	public Highscore hs;
+	Highscore hs;
+	Settings stgs = new Settings();
+	GameStates gameState;
 	MediaPlayer player;
 
 	public MySurfaceView(Context context)
@@ -113,6 +115,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		}
 		catch (InterruptedException e)
 		{}
+		hs.write();
 		Log.d("FlappyPixel", "surfaceDestroyed ended");
 	}
 
