@@ -1,4 +1,4 @@
-package ru.freeflight.sohard;
+package ru.freeflight.sohardnew;
 
 import android.content.*;
 import java.io.*;
