@@ -146,10 +146,10 @@ public class Gate
 
 		if (length == 1)
 		{
-			//topBorder[0] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(ypos[0])))-3;
-			topBorder[0] = Math.max(0,(int)Math.floor(ypos[0]))-1;
-			//bottomBorder[0] = (int) Math.floor(ypos[0])+MySurfaceView.rand.nextInt(Math.max(1,MySurfaceView.miniHeight-(int)Math.floor(ypos[0])))+2;
-			bottomBorder[0] = (int) Math.floor(ypos[0])+2;
+			topBorder[0] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(ypos[0])))-1;
+			//topBorder[0] = Math.max(0,(int)Math.floor(ypos[0]))-1;
+			bottomBorder[0] = (int) Math.floor(ypos[0])+MySurfaceView.rand.nextInt(Math.max(1,MySurfaceView.miniHeight-(int)Math.floor(ypos[0])))+2;
+			//bottomBorder[0] = (int) Math.floor(ypos[0])+2;
 			gateScore = 1;
 			//Log.d("FlappyPixel", "topBorder[0]: "+ topBorder[0]);
 			//Log.d("FlappyPixel", "bottomBorder[0]: "+ bottomBorder[0]);

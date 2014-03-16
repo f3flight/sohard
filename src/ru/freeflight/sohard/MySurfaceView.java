@@ -44,7 +44,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	int birdDeadColor = Color.rgb(63, 15, 102);
 	public static int gateColor = Color.rgb(69,0,16);
 	int birdColor = gateColor;
-	int scoreColor = Color.rgb(204, 128, 0);
+	int scoreColor = Color.rgb(255, 218, 153);
 	int scoreDeadColor = Color.rgb(158, 35, 255);
 	int startColor = Color.WHITE;
 	public static int bonusColor = Color.rgb(255,241,25);
