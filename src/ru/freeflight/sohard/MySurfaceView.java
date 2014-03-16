@@ -26,7 +26,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	public static int miniHeight = 27;
 	double birdDoublePos;
 	int birdVertPos;
-	int birdHorPos;
+	int birdHorPos = 1;
 	double birdVelocity;
 	public static double birdGravity;
 	public static double birdFlapVelocity;
@@ -177,7 +177,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				miniPaint.setTextAlign(Paint.Align.LEFT);
 				miniPaint.setColor(birdDeadColor);
 			}
-			miniCanvas.drawRect(1, birdVertPos, 2, birdVertPos + 1, miniPaint);
+			miniCanvas.drawRect(birdHorPos, birdVertPos, birdHorPos + 1, birdVertPos + 1, miniPaint);
 		}
 		canvas.setMatrix(miniMatrix);
 		miniRect.right = miniWidth;
@@ -292,14 +292,14 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	boolean collision()
 	{
 		if (
+			miniScreen.getPixel(birdHorPos-1, birdVertPos - 1) == gateColor |
 			miniScreen.getPixel(birdHorPos, birdVertPos - 1) == gateColor |
 			miniScreen.getPixel(birdHorPos + 1, birdVertPos - 1) == gateColor |
-			miniScreen.getPixel(birdHorPos + 2, birdVertPos - 1) == gateColor |
-			miniScreen.getPixel(birdHorPos, birdVertPos) == gateColor |
-			miniScreen.getPixel(birdHorPos + 2, birdVertPos) == gateColor |
+			miniScreen.getPixel(birdHorPos - 1, birdVertPos) == gateColor |
+			miniScreen.getPixel(birdHorPos + 1, birdVertPos) == gateColor |
+			miniScreen.getPixel(birdHorPos - 1, birdVertPos + 1) == gateColor |
 			miniScreen.getPixel(birdHorPos, birdVertPos + 1) == gateColor |
-			miniScreen.getPixel(birdHorPos + 1, birdVertPos + 1) == gateColor |
-			miniScreen.getPixel(birdHorPos + 2, birdVertPos + 1) == gateColor
+			miniScreen.getPixel(birdHorPos + 1, birdVertPos + 1) == gateColor
 			)
 		{
 			return true;

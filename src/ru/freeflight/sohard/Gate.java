@@ -49,12 +49,17 @@ public class Gate
 
 	Paint bonusPaint = new Paint();
 	Paint gatePaint = new Paint();
+	Paint transparentPaint = new Paint();
+	
+	void initialInit()
+	{
+		bonusPaint.setColor(MySurfaceView.bonusColor);
+		transparentPaint.setColor(Color.TRANSPARENT);
+		transparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+	}
 	
 	void betterInit(int offset)
 	{
-		
-		bonusPaint.setColor(MySurfaceView.bonusColor);
-		
 		//Log.d("FlappyPixel","betterInit...");
 
 		maxLength = MySurfaceView.miniWidth*2;
@@ -216,6 +221,7 @@ public class Gate
 		//init(0);
 		gateBitmap = Bitmap.createBitmap(MySurfaceView.maxMiniWidth*2+1,MySurfaceView.miniHeight,Bitmap.Config.ARGB_8888);
 		gateCanvas = new Canvas(gateBitmap);
+		initialInit();
 		betterInit(0);
 		currentOffset = 0;
 	}
@@ -225,6 +231,7 @@ public class Gate
 		//init(offset);
 		gateBitmap = Bitmap.createBitmap(MySurfaceView.maxMiniWidth*2+1,MySurfaceView.miniHeight,Bitmap.Config.ARGB_8888);
 		gateCanvas = new Canvas(gateBitmap);
+		initialInit();
 		betterInit(offset);
 		currentOffset = offset;
 	}
@@ -246,6 +253,14 @@ public class Gate
 	public void debugDraw(Canvas c, int vpos)
 	{
 		c.drawBitmap(gateBitmap,0,vpos,null);
+	}
+	
+	public boolean getBonus(int birdPos)
+	{
+		//if (
+		//if (birdPos==(int)Math.floor(ypos[1-pos]))
+		//gateCanvas.drawRect(birdPos,(int)Math.floor(ypos[bonusPos]),bonusPos+1,(int)Math.floor(ypos[bonusPos])+1,transparentPaint);
+		return false;
 	}
 	
 	public void drawTunnel(Canvas c, int col)
