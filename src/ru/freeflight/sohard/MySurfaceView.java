@@ -26,7 +26,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	public static int miniHeight = 27;
 	double birdDoublePos;
 	int birdVertPos;
-	int birdHorPos = 1;
+	public static int birdHorPos = 1;
 	double birdVelocity;
 	public static double birdGravity;
 	public static double birdFlapVelocity;
@@ -41,10 +41,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	boolean highScoreSet;
 	boolean gameLaunchTextShow = true;
 	int backgroundColor = Color.rgb(255, 0, 58);
-	int birdColor = Color.BLACK;
 	int birdDeadColor = Color.rgb(63, 15, 102);
-	public static int gateColor = Color.BLACK;
-	int scoreColor = Color.rgb(255, 161, 0);
+	public static int gateColor = Color.rgb(69,0,16);
+	int birdColor = gateColor;
+	int scoreColor = Color.rgb(204, 128, 0);
 	int scoreDeadColor = Color.rgb(158, 35, 255);
 	int startColor = Color.WHITE;
 	public static int bonusColor = Color.rgb(255,241,25);
@@ -250,7 +250,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			//maxMiniWidth = getWidth() / 4;
 			maxMiniWidth = getWidth() / 12;
 			maxSpeed = maxMiniWidth / 3;
-			miniScreen = Bitmap.createBitmap(maxMiniWidth, miniHeight, Bitmap.Config.RGB_565);
+			miniScreen = Bitmap.createBitmap(maxMiniWidth, miniHeight, Bitmap.Config.ARGB_8888);
 			miniCanvas = new Canvas(miniScreen);
 			miniPaint.setTypeface(Typeface.SANS_SERIF);
 			miniPaint.setTextSize(12);

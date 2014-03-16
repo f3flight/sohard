@@ -48,6 +48,8 @@ public class GateList extends ArrayList
 			//Log.d("FlappyPixel","move second cycle...");
 			currentGate = (Gate) iter.next();
 			currentGate.move(deltaMove);
+			if (currentGate.getBonus(msv.birdVertPos))
+				msv.score = msv.score + 1;
 			if (currentGate.pos + currentGate.length < 0)
 			{
 				msv.speedUp(currentGate.length);

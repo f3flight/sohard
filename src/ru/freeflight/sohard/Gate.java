@@ -7,6 +7,7 @@ public class Gate
 {
 	Bitmap gateBitmap;
 	Canvas gateCanvas;
+	int birdRelativePos;
 	public double doublePos = MySurfaceView.miniWidth;
 	public int pos = MySurfaceView.miniWidth;
 	public int length;
@@ -44,6 +45,7 @@ public class Gate
 //	public int down1, down2, down3;
 //	public int maxUp, minDown;
 //	int minGap = 5;
+	boolean[] bonusGained;
 	boolean scored;
 	double gateScore;
 
@@ -81,6 +83,7 @@ public class Gate
 		topBorder = new int[maxLength];
 		bottomBorder = new int[maxLength];
 		
+		bonusGained = new boolean[maxLength+1];
 		scored = false;
 		gateScore = 0;
 		doublePos = MySurfaceView.miniWidth + offset;
@@ -257,9 +260,18 @@ public class Gate
 	
 	public boolean getBonus(int birdPos)
 	{
-		//if (
-		//if (birdPos==(int)Math.floor(ypos[1-pos]))
-		//gateCanvas.drawRect(birdPos,(int)Math.floor(ypos[bonusPos]),bonusPos+1,(int)Math.floor(ypos[bonusPos])+1,transparentPaint);
+		birdRelativePos = MySurfaceView.birdHorPos+1-pos;
+		if (birdRelativePos >= 0 & birdRelativePos <= length+1)
+		{
+			//gateCanvas.drawColor(MySurfaceView.gateColor);
+			if (!bonusGained[birdRelativePos] & birdPos == (int)Math.floor(ypos[birdRelativePos]))
+				if (gateBitmap.getPixel(birdRelativePos,(int)Math.floor(ypos[birdRelativePos])) == MySurfaceView.bonusColor)
+				{
+					bonusGained[birdRelativePos] = true;
+					gateCanvas.drawRect(birdRelativePos,(int)Math.floor(ypos[birdRelativePos]),birdRelativePos+1,(int)Math.floor(ypos[birdRelativePos])+1,transparentPaint);
+					return true;
+				}
+		}
 		return false;
 	}
 	
@@ -268,6 +280,7 @@ public class Gate
 		gateBitmap.eraseColor(Color.TRANSPARENT);
 		bonusPaint.setColor(MySurfaceView.bonusColor);
 		gatePaint.setColor(col);
+		if (!bonusGained[0])
 		c.drawRect(0,(int)Math.floor(ypos[0]),1,(int)Math.floor(ypos[0])+1,bonusPaint);
 		for (elementNum = 0; elementNum < length; elementNum++)
 		{
@@ -276,7 +289,8 @@ public class Gate
 			if (bottomBorder[elementNum] < MySurfaceView.miniHeight)
 				c.drawRect(1+elementNum,bottomBorder[elementNum],1+elementNum+1,MySurfaceView.miniHeight,gatePaint);
 			if ((elementNum+1)%4==0)
-				c.drawRect(1+elementNum,(int)Math.floor(ypos[elementNum+1]),1+elementNum+1,(int)Math.floor(ypos[elementNum+1])+1,bonusPaint);
+				if (!bonusGained[elementNum+1])
+					c.drawRect(1+elementNum,(int)Math.floor(ypos[elementNum+1]),1+elementNum+1,(int)Math.floor(ypos[elementNum+1])+1,bonusPaint);
 		}
 		//c.drawRect(pos+elementNum,(int)Math.floor(ypos[elementNum+1]),pos+elementNum+1,(int)Math.floor(ypos[elementNum+1])+1,debugPaint);
 //			iter = pixels.iterator();
