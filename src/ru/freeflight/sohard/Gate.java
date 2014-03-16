@@ -45,8 +45,14 @@ public class Gate
 	boolean scored;
 	double gateScore;
 
+	Paint debugPaint = new Paint();
+	
+	
 	void betterInit(int offset)
 	{
+		
+		debugPaint.setColor(Color.GRAY);
+		
 		//Log.d("FlappyPixel","betterInit...");
 
 		maxLength = MySurfaceView.miniWidth*2;
@@ -73,12 +79,12 @@ public class Gate
 		doublePos = MySurfaceView.miniWidth + offset;
 		pos = MySurfaceView.miniWidth + offset;
 		length = MySurfaceView.rand.nextInt(maxLength - 1) + 1;
-		dt = Math.abs(1/MySurfaceView.gateSpeed);
+		dt = Math.abs(1/MySurfaceView.nextGateSpeed);
 		
 		apmax = MySurfaceView.birdFlapVelocity*10+MySurfaceView.birdGravity;
 		ymax = MySurfaceView.miniHeight - 1.5;
 		ymin = 1.5;
-		deviationDivider = Math.min(MySurfaceView.birdGravity,Math.abs(apmax))/1.5;
+		deviationDivider = Math.min(MySurfaceView.birdGravity,Math.abs(apmax))*2;
 
 		//Log.d("FlappyPixel","gate length: " + length);
 
@@ -130,8 +136,10 @@ public class Gate
 
 		if (length == 1)
 		{
-			topBorder[0] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(ypos[0])))-3;
-			bottomBorder[0] = (int) Math.floor(ypos[0])+MySurfaceView.rand.nextInt(Math.max(1,MySurfaceView.miniHeight-(int)Math.floor(ypos[0])))+2;
+			//topBorder[0] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(ypos[0])))-3;
+			topBorder[0] = Math.max(0,(int)Math.floor(ypos[0]))-1;
+			//bottomBorder[0] = (int) Math.floor(ypos[0])+MySurfaceView.rand.nextInt(Math.max(1,MySurfaceView.miniHeight-(int)Math.floor(ypos[0])))+2;
+			bottomBorder[0] = (int) Math.floor(ypos[0])+2;
 			gateScore = 1;
 			//Log.d("FlappyPixel", "topBorder[0]: "+ topBorder[0]);
 			//Log.d("FlappyPixel", "bottomBorder[0]: "+ bottomBorder[0]);
@@ -141,16 +149,26 @@ public class Gate
 			{
 				if (elementNum == length-1)
 				{
-					topBorder[elementNum] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(Math.min(ypos[elementNum],ypos[elementNum+1]))))-3;
+					topBorder[elementNum] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(Math.min(ypos[elementNum],ypos[elementNum+1]))))-1;
+					//topBorder[elementNum] = Math.max(0,(int)Math.floor(Math.min(ypos[elementNum],ypos[elementNum+1])))-1;
 					bottomBorder[elementNum] = (int) Math.floor(Math.max(ypos[elementNum],ypos[elementNum+1]))+MySurfaceView.rand.nextInt(Math.max(1,MySurfaceView.miniHeight-(int)Math.floor(Math.max(ypos[elementNum],ypos[elementNum+1]))))+2;
-					
+					//bottomBorder[elementNum] = (int) Math.floor(Math.max(ypos[elementNum],ypos[elementNum+1]))+2;
 					//topBorder[elementNum] = (int) Math.floor(Math.min(ypos[elementNum],ypos[elementNum+1]))-2;
 					//bottomBorder[elementNum] = (int) Math.floor(Math.max(ypos[elementNum],ypos[elementNum+1]))+2;
+				} else if (elementNum == length-2)
+				{
+					topBorder[elementNum] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(Math.min(Math.min(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))))-1;
+					//topBorder[elementNum] = Math.max(0,(int)Math.floor(Math.min(Math.min(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2])))-1;
+					bottomBorder[elementNum] = (int) Math.floor(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))+MySurfaceView.rand.nextInt(Math.max(1,MySurfaceView.miniHeight-(int)Math.floor(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))))+2;
+					//bottomBorder[elementNum] = (int) Math.floor(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))+2;
+					//topBorder[elementNum] = (int) Math.floor(Math.min(Math.min(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))-2;
+					//bottomBorder[elementNum] = (int) Math.floor(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))+2;
 				} else
 				{
-					topBorder[elementNum] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(Math.min(Math.min(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))))-3;
-					bottomBorder[elementNum] = (int) Math.floor(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))+MySurfaceView.rand.nextInt(Math.max(1,MySurfaceView.miniHeight-(int)Math.floor(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))))+2;
-					
+					topBorder[elementNum] = MySurfaceView.rand.nextInt(Math.max(1,(int)Math.floor(Math.min(Math.min(Math.min(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]),ypos[elementNum+3]))))-1;
+					//topBorder[elementNum] = Math.max(0,(int)Math.floor(Math.min(Math.min(Math.min(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]),ypos[elementNum+3])))-1;
+					bottomBorder[elementNum] = (int) Math.floor(Math.max(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]),ypos[elementNum+3]))+MySurfaceView.rand.nextInt(Math.max(1,MySurfaceView.miniHeight-(int)Math.floor(Math.max(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]),ypos[elementNum+3]))))+2;
+					//bottomBorder[elementNum] = (int) Math.floor(Math.max(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]),ypos[elementNum+3]))+2;
 					//topBorder[elementNum] = (int) Math.floor(Math.min(Math.min(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))-2;
 					//bottomBorder[elementNum] = (int) Math.floor(Math.max(Math.max(ypos[elementNum],ypos[elementNum+1]),ypos[elementNum+2]))+2;
 				}
@@ -206,13 +224,17 @@ public class Gate
 
 	public void Draw(Canvas c, Paint p)
 	{
+		c.drawRect(pos-1,(int)Math.floor(ypos[0]),pos,(int)Math.floor(ypos[0])+1,debugPaint);
 		for (elementNum = 0; elementNum < length; elementNum++)
 		{
 			if (topBorder[elementNum] > 0)
 				c.drawRect(pos+elementNum,0,pos+elementNum+1,topBorder[elementNum],p);
 			if (bottomBorder[elementNum] < MySurfaceView.miniHeight)
 				c.drawRect(pos+elementNum,bottomBorder[elementNum],pos+elementNum+1,MySurfaceView.miniHeight,p);
+			if ((elementNum+1)%4==0)
+				c.drawRect(pos+elementNum,(int)Math.floor(ypos[elementNum+1]),pos+elementNum+1,(int)Math.floor(ypos[elementNum+1])+1,debugPaint);
 		}
+		//c.drawRect(pos+elementNum,(int)Math.floor(ypos[elementNum+1]),pos+elementNum+1,(int)Math.floor(ypos[elementNum+1])+1,debugPaint);
 //			iter = pixels.iterator();
 //			int hor = pos, vert = 0;
 //			while (iter.hasNext())

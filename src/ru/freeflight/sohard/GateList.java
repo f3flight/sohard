@@ -6,13 +6,15 @@ import java.util.*;
 
 public class GateList extends ArrayList
 {
+	MySurfaceView msv;
 	int maxOffset = 0;
 	int gateOffset = 0;
 	Iterator iter;
 	Gate currentGate;
-	public GateList()
+	public GateList(MySurfaceView msv)
 	{
 		super();
+		this.msv = msv;
 	}
 
 	public void addGate()
@@ -20,6 +22,7 @@ public class GateList extends ArrayList
 		updateGateOffset();
 		currentGate = new Gate(maxOffset);
 		maxOffset += currentGate.length+gateOffset;
+		MySurfaceView.nextGateSpeed = MySurfaceView.gateSpeed - 0.05D*currentGate.length/2;
 		//Log.d("FlappyPixel","maxOffset changed to:"+maxOffset);
 		super.add(currentGate);
 	}
@@ -44,6 +47,7 @@ public class GateList extends ArrayList
 			currentGate.move(deltaMove);
 			if (currentGate.pos + currentGate.length < 0)
 			{
+				msv.speedUp(currentGate.length);
 				//Log.d("FlappyPixel"," ");
 				//Log.d("FlappyPixel","Move gate back to right. maxOffset is:"+maxOffset);
 				currentGate.doublePos = MySurfaceView.miniWidth+maxOffset;

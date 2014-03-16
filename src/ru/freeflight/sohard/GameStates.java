@@ -8,9 +8,10 @@ public enum GameStates
 	start,
 	settings,
 	gameOn,
-	gameOver;
+	gameOver,
+	gameOverStage2;
 	
-	public GameStates loadGameState()
+	public static GameStates loadGameState()
 	{
 		GameStates gameState = GameStates.start;
 		try

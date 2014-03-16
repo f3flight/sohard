@@ -31,11 +31,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	public static double birdGravity;
 	public static double birdFlapVelocity;
 	double deltaTime, time;
-	public static double gateSpeed;
+	public static double gateSpeed, nextGateSpeed;
 	double maxSpeed;
 	boolean maxSpeedReached;
 	double initialGateSpeed;
-	boolean gameOver, afterGameOver, gameLaunch = true, gameInitialized = false;
+	boolean gameInitialized = false;
 	long tick;
 	public static long score;
 	boolean highScoreSet;
@@ -52,7 +52,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	//Gate gate2;
 	GateList gateList;
 	Highscore hs;
-	Settings stgs = new Settings();
+	Settings stgs;
 	GameStates gameState;
 	MediaPlayer player;
 
@@ -125,7 +125,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawColor(Color.BLACK);
 		miniPaint.setColor(backgroundColor);
 		miniCanvas.drawRect(0, 0, miniWidth, miniHeight, miniPaint);
-		if (gameLaunch)
+		if (gameState == GameStates.start)
 		{
 			if (tick % 60 == 0) 
 			{
@@ -145,7 +145,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		}
 		else
 		{
-			if (!gameOver)
+			if (gameState != GameStates.gameOver)
 			{
 				miniPaint.setColor(scoreColor);
 				miniPaint.setTextSize(11);
@@ -160,7 +160,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				miniPaint.setColor(birdDeadColor);
 			}
 			gateList.Draw(miniCanvas, miniPaint);
-			if (!gameOver) miniPaint.setColor(birdColor);
+			if (gameState != GameStates.gameOver) miniPaint.setColor(birdColor);
 			else
 			{
 				if (highScoreSet)
@@ -183,7 +183,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		screenRect.bottom = getHeight();
 		canvas.drawBitmap(miniScreen, miniRect, miniRect, null);
 		canvas.setMatrix(null);
-		if (!gameOver & !gameLaunch)
+		if (gameState != GameStates.gameOver & gameState != GameStates.start)
 		{
 			miniPaint.setColor(Color.WHITE);
 			miniPaint.setAlpha(80);
@@ -205,9 +205,9 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if (gameLaunch)
+		if (gameState == GameStates.start)
 		{
-			gameLaunch = false;
+			gameState = GameStates.gameOn;
 			time = SystemClock.uptimeMillis() / 1000D;
 			player = MediaPlayer.create(context, R.raw.theme);
 			player.setLooping(true);
@@ -219,7 +219,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			{
 				birdVelocity = birdVelocity + birdFlapVelocity;
 			}
-			if (afterGameOver)
+			if (gameState == GameStates.gameOverStage2)
 			{
 				mt.stopRunning();
 				try
@@ -243,7 +243,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	{
 		if (getWidth() > 0)
 		{
-			maxMiniWidth = getWidth() / 4;
+			//maxMiniWidth = getWidth() / 4;
+			maxMiniWidth = getWidth() / 12;
 			maxSpeed = maxMiniWidth / 3;
 			miniScreen = Bitmap.createBitmap(maxMiniWidth, miniHeight, Bitmap.Config.RGB_565);
 			miniCanvas = new Canvas(miniScreen);
@@ -251,6 +252,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			miniPaint.setTextSize(12);
 			hs = new Highscore();
 			init();
+			
+			stgs = new Settings();
+			gameState = GameStates.loadGameState();
+			
 			gameInitialized = true;
 		}
 	}
@@ -266,6 +271,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		miniWidth = 27;
 		initialGateSpeed = -miniWidth / 10;
 		gateSpeed = initialGateSpeed;
+		nextGateSpeed = initialGateSpeed;
 		birdDoublePos = miniHeight / 2;
 		birdVertPos = miniHeight / 2;
 		birdVelocity = 0;
@@ -273,16 +279,16 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		birdFlapVelocity = -miniHeight / 6 ;
 		deltaTime = 0;
 		time = SystemClock.uptimeMillis() / 1000D;
-		gameOver = false;
-		afterGameOver = false;
+		gameState = GameStates.gameOn;
 		maxSpeedReached = false;
 		score = 0;
 		tick = 0;
 		highScoreSet = false;
-		gateList = new GateList();
+		gateList = new GateList(this);
 		gateList.addGate();
 		gateList.addGate();
-		setMatrix();
+		setMatrix();		
+		
 	}
 
 	boolean collision()
@@ -313,7 +319,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 	void gameOver()
 	{
-		gameOver = true;
+		gameState = GameStates.gameOver;
 		if (player != null)
 		{
 			player.setLooping(false);
@@ -326,6 +332,13 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			hs.setHighscore(score);
 			highScoreSet = true;
 		}
+	}
+	
+	public void speedUp(int length)
+	{
+		gateSpeed = gateSpeed - 0.05D*length/2;
+		miniWidth = (int)Math.floor((0.9 + 0.1 * gateSpeed / initialGateSpeed) * miniHeight);
+		setMatrix();
 	}
 
 	class MainThread extends Thread
@@ -358,7 +371,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				tick++;
 				deltaTime = SystemClock.uptimeMillis() / 1000D - time;
 				time = SystemClock.uptimeMillis() / 1000D;
-				if (!gameLaunch)
+				if (gameState != GameStates.start)
 				{
 					if (!maxSpeedReached & Math.abs(gateSpeed) >= maxSpeed)
 					{
@@ -367,18 +380,18 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 						backgroundColor = highscoreColor;
 						highscoreColor = tempInt;
 					}
-					if (tick % 60 == 0 & !maxSpeedReached)
-					{
-						gateSpeed = gateSpeed - 0.05D;
-						miniWidth = (int)Math.floor((0.9 + 0.1 * gateSpeed / initialGateSpeed) * miniHeight);
-						setMatrix();
-					}
+//					if (tick % 60 == 0 & !maxSpeedReached)
+//					{
+//						gateSpeed = gateSpeed - 0.05D;
+//						miniWidth = (int)Math.floor((0.9 + 0.1 * gateSpeed / initialGateSpeed) * miniHeight);
+//						setMatrix();
+//					}
 
 					if (collision())
 					{
 						gameOver();
 					}
-					if (birdVertPos < miniHeight - 1 & birdVertPos > 0 & !gameOver)
+					if (birdVertPos < miniHeight - 1 & birdVertPos > 0 & gameState != GameStates.gameOver)
 					{
 						birdVelocity = birdVelocity + birdGravity * deltaTime;
 						birdDoublePos = birdDoublePos + birdVelocity * deltaTime;
@@ -409,7 +422,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 					msv.onDraw(screenCanvas);
 					msv.getHolder().unlockCanvasAndPost(screenCanvas);
 				}
-				if (!msv.gameOver)
+				if (gameState != GameStates.gameOver)
 				{
 
 					if (SystemClock.uptimeMillis() - (time - deltaTime) * 1000D < 15)
@@ -429,7 +442,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 					}
 					catch (InterruptedException e)
 					{}
-					afterGameOver = true;
+					gameState = GameStates.gameOverStage2;
 				}
 			}
 		}
