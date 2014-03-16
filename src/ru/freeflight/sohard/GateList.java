@@ -11,10 +11,13 @@ public class GateList extends ArrayList
 	int gateOffset = 0;
 	Iterator iter;
 	Gate currentGate;
+	Paint debugPaint = new Paint();
+	
 	public GateList(MySurfaceView msv)
 	{
 		super();
 		this.msv = msv;
+		debugPaint.setColor(Color.RED);
 	}
 
 	public void addGate()
@@ -59,13 +62,26 @@ public class GateList extends ArrayList
 		}
 	}
 
-	public void Draw(Canvas c, Paint p)
+	public void Draw(Canvas c, int col)
 	{
 		iter = iterator();
 		while (iter.hasNext())
 		{
 			currentGate = (Gate) iter.next();
-			currentGate.Draw(c,p);
+			currentGate.Draw(c,col);
+		}
+	}
+	
+	public void debugDraw(Canvas c)
+	{
+		iter = iterator();
+		int vpos = 0;
+		while (iter.hasNext())
+		{
+			currentGate = (Gate) iter.next();
+			c.drawRect(0,vpos,MySurfaceView.maxMiniWidth*2+1,vpos+MySurfaceView.miniHeight,debugPaint);
+			currentGate.debugDraw(c,vpos);
+			vpos = vpos + MySurfaceView.miniHeight+1;
 		}
 	}
 	

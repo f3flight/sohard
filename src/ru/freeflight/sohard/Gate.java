@@ -5,6 +5,8 @@ import android.util.*;
 
 public class Gate
 {
+	Bitmap gateBitmap;
+	Canvas gateCanvas;
 	public double doublePos = MySurfaceView.miniWidth;
 	public int pos = MySurfaceView.miniWidth;
 	public int length;
@@ -45,13 +47,13 @@ public class Gate
 	boolean scored;
 	double gateScore;
 
-	Paint debugPaint = new Paint();
-	
+	Paint bonusPaint = new Paint();
+	Paint gatePaint = new Paint();
 	
 	void betterInit(int offset)
 	{
 		
-		debugPaint.setColor(MySurfaceView.bonusColor);
+		bonusPaint.setColor(MySurfaceView.bonusColor);
 		
 		//Log.d("FlappyPixel","betterInit...");
 
@@ -206,11 +208,14 @@ public class Gate
 //				}
 //			}
 
+		fillBitmap(MySurfaceView.gateColor);
 	}
 
 	public Gate()
 	{
 		//init(0);
+		gateBitmap = Bitmap.createBitmap(MySurfaceView.maxMiniWidth*2+1,MySurfaceView.miniHeight,Bitmap.Config.ARGB_8888);
+		gateCanvas = new Canvas(gateBitmap);
 		betterInit(0);
 		currentOffset = 0;
 	}
@@ -218,21 +223,45 @@ public class Gate
 	public Gate(int offset)
 	{
 		//init(offset);
+		gateBitmap = Bitmap.createBitmap(MySurfaceView.maxMiniWidth*2+1,MySurfaceView.miniHeight,Bitmap.Config.ARGB_8888);
+		gateCanvas = new Canvas(gateBitmap);
 		betterInit(offset);
 		currentOffset = offset;
 	}
 
-	public void Draw(Canvas c, Paint p)
+	void fillBitmap(int col)
 	{
-		c.drawRect(pos-1,(int)Math.floor(ypos[0]),pos,(int)Math.floor(ypos[0])+1,debugPaint);
+		drawTunnel(gateCanvas,col);
+	}
+	
+	public void Draw(Canvas c, int col)
+	{
+		if (col!=MySurfaceView.gateColor)
+		{
+			fillBitmap(col);
+		}
+		c.drawBitmap(gateBitmap,pos-1,0,null);
+	}
+	
+	public void debugDraw(Canvas c, int vpos)
+	{
+		c.drawBitmap(gateBitmap,0,vpos,null);
+	}
+	
+	public void drawTunnel(Canvas c, int col)
+	{
+		gateBitmap.eraseColor(Color.TRANSPARENT);
+		bonusPaint.setColor(MySurfaceView.bonusColor);
+		gatePaint.setColor(col);
+		c.drawRect(0,(int)Math.floor(ypos[0]),1,(int)Math.floor(ypos[0])+1,bonusPaint);
 		for (elementNum = 0; elementNum < length; elementNum++)
 		{
 			if (topBorder[elementNum] > 0)
-				c.drawRect(pos+elementNum,0,pos+elementNum+1,topBorder[elementNum],p);
+				c.drawRect(1+elementNum,0,1+elementNum+1,topBorder[elementNum],gatePaint);
 			if (bottomBorder[elementNum] < MySurfaceView.miniHeight)
-				c.drawRect(pos+elementNum,bottomBorder[elementNum],pos+elementNum+1,MySurfaceView.miniHeight,p);
+				c.drawRect(1+elementNum,bottomBorder[elementNum],1+elementNum+1,MySurfaceView.miniHeight,gatePaint);
 			if ((elementNum+1)%4==0)
-				c.drawRect(pos+elementNum,(int)Math.floor(ypos[elementNum+1]),pos+elementNum+1,(int)Math.floor(ypos[elementNum+1])+1,debugPaint);
+				c.drawRect(1+elementNum,(int)Math.floor(ypos[elementNum+1]),1+elementNum+1,(int)Math.floor(ypos[elementNum+1])+1,bonusPaint);
 		}
 		//c.drawRect(pos+elementNum,(int)Math.floor(ypos[elementNum+1]),pos+elementNum+1,(int)Math.floor(ypos[elementNum+1])+1,debugPaint);
 //			iter = pixels.iterator();

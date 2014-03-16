@@ -22,7 +22,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	float miniZoom;
 	Matrix miniMatrix = new Matrix();
 	public static int miniWidth;
-	int maxMiniWidth;
+	public static int maxMiniWidth;
 	public static int miniHeight = 27;
 	double birdDoublePos;
 	int birdVertPos;
@@ -43,8 +43,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	int backgroundColor = Color.rgb(255, 0, 58);
 	int birdColor = Color.BLACK;
 	int birdDeadColor = Color.rgb(63, 15, 102);
-	int gateColor = Color.BLACK;
-	int scoreColor = Color.rgb(255, 186, 202);
+	public static int gateColor = Color.BLACK;
+	int scoreColor = Color.rgb(255, 161, 0);
 	int scoreDeadColor = Color.rgb(158, 35, 255);
 	int startColor = Color.WHITE;
 	public static int bonusColor = Color.rgb(255,241,25);
@@ -156,20 +156,20 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				miniPaint.setTextAlign(Paint.Align.RIGHT);
 				miniCanvas.drawText(score + "", miniWidth - 1, 9, miniPaint);
 				miniPaint.setTextAlign(Paint.Align.LEFT);
-				miniPaint.setColor(gateColor);
+				gateList.Draw(miniCanvas, gateColor);
 			}
 			else
 			{
-				miniPaint.setColor(birdDeadColor);
+				gateList.Draw(miniCanvas, birdDeadColor);
 			}
-			gateList.Draw(miniCanvas, miniPaint);
+			
 			if (gameState != GameStates.gameOver) miniPaint.setColor(birdColor);
 			else
 			{
 				if (highScoreSet)
 					miniPaint.setColor(highscoreColor);
 				else
-					miniPaint.setColor(scoreDeadColor);
+					miniPaint.setColor(scoreColor);
 				miniPaint.setTextSize(11);
 				miniPaint.setTypeface(Typeface.SANS_SERIF);
 				miniPaint.setTextAlign(Paint.Align.RIGHT);
@@ -186,6 +186,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		screenRect.bottom = getHeight();
 		canvas.drawBitmap(miniScreen, miniRect, miniRect, null);
 		canvas.setMatrix(null);
+		//gateList.debugDraw(canvas);
 		if (gameState != GameStates.gameOver & gameState != GameStates.start)
 		{
 			miniPaint.setColor(Color.WHITE);
