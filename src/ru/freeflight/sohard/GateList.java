@@ -72,7 +72,7 @@ public class GateList extends ArrayList
 	void updateGateOffset()
 	{
 		//gateOffset = 1;
-		gateOffset = (int)(Math.abs(MySurfaceView.gateSpeed)*2);
+		gateOffset = (int)(Math.abs(MySurfaceView.nextGateSpeed)*2);
 	}
 
 }

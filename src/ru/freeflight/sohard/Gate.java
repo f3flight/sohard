@@ -51,7 +51,7 @@ public class Gate
 	void betterInit(int offset)
 	{
 		
-		debugPaint.setColor(Color.GRAY);
+		debugPaint.setColor(MySurfaceView.bonusColor);
 		
 		//Log.d("FlappyPixel","betterInit...");
 

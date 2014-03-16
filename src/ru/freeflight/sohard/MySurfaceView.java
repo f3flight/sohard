@@ -44,7 +44,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	int birdColor = Color.BLACK;
 	int birdDeadColor = Color.rgb(63, 15, 102);
 	int gateColor = Color.BLACK;
-	int scoreColor = Color.WHITE;
+	int scoreColor = Color.rgb(255, 186, 202);
+	int scoreDeadColor = Color.rgb(158, 35, 255);
+	int startColor = Color.WHITE;
+	public static int bonusColor = Color.rgb(255,241,25);
 	int tempInt;
 	public static int highscoreColor = Color.rgb(67, 204, 0);
 
@@ -134,7 +137,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 			if (gameLaunchTextShow)
 			{
-				miniPaint.setColor(scoreColor);
+				miniPaint.setColor(startColor);
 				miniPaint.setTypeface(Typeface.SERIF);
 				miniPaint.setTextSize(8);
 				miniPaint.setTextAlign(Paint.Align.CENTER);
@@ -166,7 +169,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				if (highScoreSet)
 					miniPaint.setColor(highscoreColor);
 				else
-					miniPaint.setColor(scoreColor);
+					miniPaint.setColor(scoreDeadColor);
 				miniPaint.setTextSize(11);
 				miniPaint.setTypeface(Typeface.SANS_SERIF);
 				miniPaint.setTextAlign(Paint.Align.RIGHT);
@@ -262,12 +265,6 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 	void init()
 	{
-		backgroundColor = Color.rgb(255, 0, 58);
-		birdColor = Color.BLACK;
-		birdDeadColor = Color.rgb(63, 15, 102);
-		gateColor = Color.BLACK;
-		scoreColor = Color.WHITE;
-		highscoreColor = Color.rgb(67, 204, 0);
 		miniWidth = 27;
 		initialGateSpeed = -miniWidth / 10;
 		gateSpeed = initialGateSpeed;
@@ -337,6 +334,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	public void speedUp(int length)
 	{
 		gateSpeed = gateSpeed - 0.05D*length/2;
+		nextGateSpeed = gateSpeed - 0.05D*length/2;
 		miniWidth = (int)Math.floor((0.9 + 0.1 * gateSpeed / initialGateSpeed) * miniHeight);
 		setMatrix();
 	}
