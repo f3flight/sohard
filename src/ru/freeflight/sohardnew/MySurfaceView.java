@@ -75,8 +75,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	@Override
 	public void surfaceCreated(SurfaceHolder p1)
 	{
-		player = MediaPlayer.create(context, R.raw.intro);
-        player.start();
+		if (player == null)
+		{
+			player = MediaPlayer.create(context, R.raw.intro);
+			player.start();
+		}
 		Log.d(MainActivity.logtag, "surfaceCreated started");
 		setMatrix();
 		if (mt != null)
@@ -111,7 +114,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		gameState = GameStates.paused;
 		if (player != null)
 		{
-			player.stop();
+			player.pause();
 		}
 		Log.d(MainActivity.logtag, "surfaceDestroyed started");
 		mt.stopRunning();
@@ -243,9 +246,15 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		
-		if (event.getAction() != MotionEvent.ACTION_DOWN)
-			return true;
+		switch (event.getAction())
+		{
+			case MotionEvent.ACTION_DOWN:
+				break;
+			//case MotionEvent.ACTION_POINTER_DOWN:
+				//break;
+			default:
+			    return true;			
+		}
 			
 		switch (gameState)
 		{
@@ -263,6 +272,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			
 			case paused:
 				gameState = GameStates.on;
+				player.start();
 				break;
 				
 			//case over:
