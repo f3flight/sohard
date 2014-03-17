@@ -37,6 +37,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	double initialGateSpeed;
 	boolean gameInitialized = false;
 	long tick;
+	final long fastFrameMillis = 15, slowFrameMillis = 500;
 	public static long score;
 	boolean highScoreSet;
 	boolean gameLaunchTextShow = true;
@@ -50,6 +51,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	public static int bonusColor = Color.rgb(255,241,25);
 	int tempInt;
 	public static int highscoreColor = Color.rgb(67, 204, 0);
+	int pauseColor = Color.argb(128,0,0,0);
 
 	//Gate gate1;
 	//Gate gate2;
@@ -62,12 +64,12 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	public MySurfaceView(Context context)
 	{
 		super(context);
-		Log.d("FlappyPixel", "MySurfaceView constructor started");
+		Log.d(MainActivity.logtag, "MySurfaceView constructor started");
 		getHolder().addCallback(this);
 		setFocusable(true);	
 		this.context = context;
 		mt = new MainThread(this);
-		Log.d("FlappyPixel", "MySurfaceView constructor ended");
+		Log.d(MainActivity.logtag, "MySurfaceView constructor ended");
 	}
 
 	@Override
@@ -75,42 +77,43 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	{
 		player = MediaPlayer.create(context, R.raw.intro);
         player.start();
-		Log.d("FlappyPixel", "surfaceCreated started");
+		Log.d(MainActivity.logtag, "surfaceCreated started");
 		setMatrix();
 		if (mt != null)
 		{
 			if (mt.getState() == Thread.State.TERMINATED)
 			{
-				Log.d("FlappyPixel", "mainThread state is 'terminated'. Creating new thread.");
+				Log.d(MainActivity.logtag, "mainThread state is 'terminated'. Creating new thread.");
 				mt = new MainThread(this);
 			}
-			Log.d("FlappyPixel", "mainThread starting");
+			Log.d(MainActivity.logtag, "mainThread starting");
 			mt.start();
 		}
 		else
 		{
-			Log.d("FlappyPixel", "mainThread is null, nothing to do?");
+			Log.d(MainActivity.logtag, "mainThread is null, nothing to do?");
 		}
 
-		Log.d("FlappyPixel", "surfaceCreated ended");
+		Log.d(MainActivity.logtag, "surfaceCreated ended");
 	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder p1, int p2, int p3, int p4)
 	{
-		Log.d("FlappyPixel", "surfaceChanged started");
+		Log.d(MainActivity.logtag, "surfaceChanged started");
 		setMatrix();
-		Log.d("FlappyPixel", "surfaceChanged ended");
+		Log.d(MainActivity.logtag, "surfaceChanged ended");
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder p1)
 	{
+		gameState = GameStates.paused;
 		if (player != null)
 		{
 			player.stop();
 		}
-		Log.d("FlappyPixel", "surfaceDestroyed started");
+		Log.d(MainActivity.logtag, "surfaceDestroyed started");
 		mt.stopRunning();
 		try
 		{
@@ -119,66 +122,87 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		catch (InterruptedException e)
 		{}
 		hs.write();
-		Log.d("FlappyPixel", "surfaceDestroyed ended");
+		Log.d(MainActivity.logtag, "surfaceDestroyed ended");
 	}
 
+	void drawGameAreaStart()
+	{
+		if (tick % 60 == 0) 
+		{
+			gameLaunchTextShow = !gameLaunchTextShow;
+		}
+
+		if (gameLaunchTextShow)
+		{
+			miniPaint.setColor(startColor);
+			miniPaint.setTypeface(Typeface.SERIF);
+			miniPaint.setTextSize(8);
+			miniPaint.setTextAlign(Paint.Align.CENTER);
+			miniCanvas.drawText("START", (int)(miniHeight * 0.5F), (int)(miniHeight * 0.25 + 0.5 * miniPaint.getTextSize()), miniPaint);
+			miniPaint.setTextAlign(Paint.Align.LEFT);
+		}
+		hs.Draw(miniCanvas, miniPaint);
+	}
+	
+	void drawGameAreaAlive()
+	{
+		miniPaint.setColor(scoreColor);
+		miniPaint.setTextSize(11);
+		miniPaint.setTypeface(Typeface.SANS_SERIF);
+		miniPaint.setTextAlign(Paint.Align.RIGHT);
+		miniCanvas.drawText(score + "", miniWidth - 1, 9, miniPaint);
+		miniPaint.setTextAlign(Paint.Align.LEFT);
+		gateList.Draw(miniCanvas, gateColor);
+		miniPaint.setColor(birdColor);
+		miniCanvas.drawRect(birdHorPos, birdVertPos, birdHorPos + 1, birdVertPos + 1, miniPaint);
+	}
+	
+	void drawGameAreaDead()
+	{
+		gateList.Draw(miniCanvas, birdDeadColor);
+		if (highScoreSet)
+			miniPaint.setColor(highscoreColor);
+		else
+			miniPaint.setColor(scoreColor);
+		miniPaint.setTextSize(11);
+		miniPaint.setTypeface(Typeface.SANS_SERIF);
+		miniPaint.setTextAlign(Paint.Align.RIGHT);
+		miniCanvas.drawText(score + "", miniWidth - 1, 9, miniPaint);
+		miniPaint.setTextAlign(Paint.Align.LEFT);
+		miniPaint.setColor(birdDeadColor);
+		miniCanvas.drawRect(birdHorPos, birdVertPos, birdHorPos + 1, birdVertPos + 1, miniPaint);
+	}
+	
 	@Override
 	protected void onDraw(Canvas canvas)
 	{
 		canvas.drawColor(Color.BLACK);
 		miniPaint.setColor(backgroundColor);
 		miniCanvas.drawRect(0, 0, miniWidth, miniHeight, miniPaint);
-		if (gameState == GameStates.start)
+		
+		switch (gameState)
 		{
-			if (tick % 60 == 0) 
-			{
-				gameLaunchTextShow = !gameLaunchTextShow;
-			}
-
-			if (gameLaunchTextShow)
-			{
-				miniPaint.setColor(startColor);
-				miniPaint.setTypeface(Typeface.SERIF);
-				miniPaint.setTextSize(8);
-				miniPaint.setTextAlign(Paint.Align.CENTER);
-				miniCanvas.drawText("START", (int)(miniHeight * 0.5F), (int)(miniHeight * 0.25 + 0.5 * miniPaint.getTextSize()), miniPaint);
-				miniPaint.setTextAlign(Paint.Align.LEFT);
-			}
-			hs.Draw(miniCanvas, miniPaint);
-		}
-		else
-		{
-			if (gameState != GameStates.gameOver)
-			{
-				miniPaint.setColor(scoreColor);
-				miniPaint.setTextSize(11);
-				miniPaint.setTypeface(Typeface.SANS_SERIF);
-				miniPaint.setTextAlign(Paint.Align.RIGHT);
-				miniCanvas.drawText(score + "", miniWidth - 1, 9, miniPaint);
-				miniPaint.setTextAlign(Paint.Align.LEFT);
-				gateList.Draw(miniCanvas, gateColor);
-			}
-			else
-			{
-				gateList.Draw(miniCanvas, birdDeadColor);
-			}
+			case start:
+				drawGameAreaStart();
+				break;
+				
+			case on:
+				drawGameAreaAlive();
+				break;
 			
-			if (gameState != GameStates.gameOver) miniPaint.setColor(birdColor);
-			else
-			{
-				if (highScoreSet)
-					miniPaint.setColor(highscoreColor);
-				else
-					miniPaint.setColor(scoreColor);
-				miniPaint.setTextSize(11);
-				miniPaint.setTypeface(Typeface.SANS_SERIF);
-				miniPaint.setTextAlign(Paint.Align.RIGHT);
-				miniCanvas.drawText(score + "", miniWidth - 1, 9, miniPaint);
-				miniPaint.setTextAlign(Paint.Align.LEFT);
-				miniPaint.setColor(birdDeadColor);
-			}
-			miniCanvas.drawRect(birdHorPos, birdVertPos, birdHorPos + 1, birdVertPos + 1, miniPaint);
+			case paused:
+				drawGameAreaAlive();
+				miniCanvas.drawColor(pauseColor);
+				miniPaint.setColor(startColor);
+				miniCanvas.drawRect(miniWidth/2-miniWidth/4,miniHeight/2-miniHeight/4,miniWidth/2-miniWidth/10,miniHeight/2+miniHeight/3,miniPaint);
+				miniCanvas.drawRect(miniWidth/2+miniWidth/10,miniHeight/2-miniHeight/4,miniWidth/2+miniWidth/4,miniHeight/2+miniHeight/3,miniPaint);
+				break;
+				
+			case over:
+				drawGameAreaDead();
+				break;
 		}
+			
 		canvas.setMatrix(miniMatrix);
 		miniRect.right = miniWidth;
 		miniRect.bottom = miniHeight;
@@ -187,7 +211,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawBitmap(miniScreen, miniRect, miniRect, null);
 		canvas.setMatrix(null);
 		//gateList.debugDraw(canvas);
-		if (gameState != GameStates.gameOver & gameState != GameStates.start)
+		if (gameState == GameStates.on | gameState == GameStates.paused)
 		{
 			miniPaint.setColor(Color.WHITE);
 			miniPaint.setAlpha(80);
@@ -205,26 +229,46 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 		super.onDraw(canvas);
 	}
+	
+	public void gameDraw()
+	{
+		screenCanvas = getHolder().lockCanvas();
+		if (screenCanvas != null)
+		{
+			onDraw(screenCanvas);
+			getHolder().unlockCanvasAndPost(screenCanvas);
+		}
+	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if (gameState == GameStates.start)
+		
+		if (event.getAction() != MotionEvent.ACTION_DOWN)
+			return true;
+			
+		switch (gameState)
 		{
-			gameState = GameStates.gameOn;
-			time = SystemClock.uptimeMillis() / 1000D;
-			player = MediaPlayer.create(context, R.raw.theme);
-			player.setLooping(true);
-			player.start();
-		}
-		else if (event.getAction() == MotionEvent.ACTION_DOWN)
-		{
-			synchronized (this)
-			{
+			case start:
+				gameState = GameStates.on;
+				time = SystemClock.uptimeMillis() / 1000D;
+				player = MediaPlayer.create(context, R.raw.theme);
+				player.setLooping(true);
+				player.start();
+				break;
+			
+			case on:
 				birdVelocity = birdVelocity + birdFlapVelocity;
-			}
-			if (gameState == GameStates.gameOverStage2)
-			{
+				break;
+			
+			case paused:
+				gameState = GameStates.on;
+				break;
+				
+			//case over:
+			//	break;
+			
+			case overStage2:
 				mt.stopRunning();
 				try
 				{
@@ -238,7 +282,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				player.start();
 				mt = new MainThread(this);
 				mt.start();
-			}
+				break;
 		}
 		return true;
 	}
@@ -277,7 +321,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		birdFlapVelocity = -miniHeight / 6 ;
 		deltaTime = 0;
 		time = SystemClock.uptimeMillis() / 1000D;
-		gameState = GameStates.gameOn;
+		gameState = GameStates.on;
 		maxSpeedReached = false;
 		score = 0;
 		tick = 0;
@@ -317,7 +361,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 	void gameOver()
 	{
-		gameState = GameStates.gameOver;
+		gameState = GameStates.over;
 		if (player != null)
 		{
 			player.setLooping(false);
@@ -350,6 +394,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		public MainThread(MySurfaceView msv)
 		{
 			this.msv = msv;
+			time = SystemClock.uptimeMillis() / 1000D;
 		}
 		@Override
 		public void run()
@@ -370,78 +415,70 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				tick++;
 				deltaTime = SystemClock.uptimeMillis() / 1000D - time;
 				time = SystemClock.uptimeMillis() / 1000D;
-				if (gameState != GameStates.start)
+				switch (gameState)
 				{
-					if (!maxSpeedReached & Math.abs(gateSpeed) >= maxSpeed)
-					{
-						maxSpeedReached = true;
-						tempInt = backgroundColor;
-						backgroundColor = highscoreColor;
-						highscoreColor = tempInt;
-					}
-//					if (tick % 60 == 0 & !maxSpeedReached)
-//					{
-//						gateSpeed = gateSpeed - 0.05D;
-//						miniWidth = (int)Math.floor((0.9 + 0.1 * gateSpeed / initialGateSpeed) * miniHeight);
-//						setMatrix();
-//					}
+					case start:
+						hs.move(deltaTime);
+						break;
+					
+					case on:
+						if (!maxSpeedReached & Math.abs(gateSpeed) >= maxSpeed)
+						{
+							maxSpeedReached = true;
+							tempInt = backgroundColor;
+							backgroundColor = highscoreColor;
+							highscoreColor = tempInt;
+						}
+						if (collision())
+						{
+							gameOver();
+						}
+						if (birdVertPos < miniHeight - 1 & birdVertPos > 0 & gameState != GameStates.over)
+						{
+							birdVelocity = birdVelocity + birdGravity * deltaTime;
+							birdDoublePos = birdDoublePos + birdVelocity * deltaTime;
+							if (Math.abs(birdVertPos - birdDoublePos) > 1)
+								birdVertPos = (birdDoublePos > birdVertPos) ? (int) Math.floor(birdDoublePos) : (int) Math.floor(birdDoublePos) + 1;
+							gateList.move(gateSpeed * deltaTime);	
+						}
 
-					if (collision())
-					{
-						gameOver();
-					}
-					if (birdVertPos < miniHeight - 1 & birdVertPos > 0 & gameState != GameStates.gameOver)
-					{
-						birdVelocity = birdVelocity + birdGravity * deltaTime;
-						birdDoublePos = birdDoublePos + birdVelocity * deltaTime;
-						if (Math.abs(birdVertPos - birdDoublePos) > 1)
-							birdVertPos = (birdDoublePos > birdVertPos) ? (int) Math.floor(birdDoublePos) : (int) Math.floor(birdDoublePos) + 1;
-						gateList.move(gateSpeed * deltaTime);	
-					}
-
-					if (birdVertPos < 1)
-					{
-						birdVertPos = 0;
-						gameOver();
-					}
-					else if (birdVertPos >= miniHeight - 1)
-					{
-						birdVertPos = miniHeight - 1;
-						gameOver();
-					}
+						if (birdVertPos < 1)
+						{
+							birdVertPos = 0;
+							gameOver();
+						}
+						else if (birdVertPos >= miniHeight - 1)
+						{
+							birdVertPos = miniHeight - 1;
+							gameOver();
+						}
+						break;
 				}
-				else
+				
+				gameDraw();
+				
+				switch (gameState)
 				{
-					hs.move(deltaTime);
-				}
-
-				screenCanvas = msv.getHolder().lockCanvas();
-				if (screenCanvas != null)
-				{
-					msv.onDraw(screenCanvas);
-					msv.getHolder().unlockCanvasAndPost(screenCanvas);
-				}
-				if (gameState != GameStates.gameOver)
-				{
-
-					if (SystemClock.uptimeMillis() - (time - deltaTime) * 1000D < 15)
+					case over:
+						running = false;
 						try
 						{
-							sleep(15 - (long)(SystemClock.uptimeMillis() - (time - deltaTime) * 1000D));
+							sleep(slowFrameMillis);
 						}
 						catch (InterruptedException e)
 						{}
-				}
-				else
-				{
-					running = false;
-					try
-					{
-						sleep(500);
-					}
-					catch (InterruptedException e)
-					{}
-					gameState = GameStates.gameOverStage2;
+						gameState = GameStates.overStage2;
+						break;
+						
+					default:
+					    if (SystemClock.uptimeMillis() - (time - deltaTime) * 1000D < fastFrameMillis)
+							try
+							{
+								sleep(fastFrameMillis - (long)(SystemClock.uptimeMillis() - (time - deltaTime) * 1000D));
+							}
+							catch (InterruptedException e)
+							{}
+					    break;
 				}
 			}
 		}

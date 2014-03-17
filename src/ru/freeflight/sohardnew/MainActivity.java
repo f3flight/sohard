@@ -11,17 +11,18 @@ import android.media.*;
 public class MainActivity extends Activity
 {
 	MySurfaceView msv;
+	public static String logtag = "sohard";
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-		Log.d("FlappyPixel","onCreate started");
+		Log.d(logtag,"onCreate started");
 		if (!isTaskRoot ()) {
 			Intent intent = getIntent();
 			String action = intent.getAction();
 			if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && action != null && action.equals(Intent.ACTION_MAIN)) {
-				Log.d("FlappyPixel","not root task and blabla - finish");
+				Log.d(logtag,"not root task and blabla - finish");
 				finish();
 				return;
 			}
@@ -34,14 +35,14 @@ public class MainActivity extends Activity
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		
-		Log.d("FlappyPixel","onCreate ended");
+		Log.d(logtag,"onCreate ended");
     }
 
 	@Override
 	protected void onDestroy()
 	{
-		Log.d("FlappyPixel","onDestroy started");
-		Log.d("FlappyPixel","onDestroy ended");
+		Log.d(logtag,"onDestroy started");
+		Log.d(logtag,"onDestroy ended");
 		super.onDestroy();
 	}
 }

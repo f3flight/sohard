@@ -7,9 +7,10 @@ public enum GameStates
 {
 	start,
 	settings,
-	gameOn,
-	gameOver,
-	gameOverStage2;
+	on,
+	paused,
+	over,
+	overStage2;
 	
 	public static GameStates loadGameState()
 	{
@@ -45,10 +46,13 @@ public enum GameStates
 		catch (FileNotFoundException e)
 		{}
 					
+		if (gameState == GameStates.paused)
+			gameState = GameStates.start;
+		
 		return gameState;
 	}
 	
-	public void saveGameState(GameStates gameState)
+	public static void saveGameState(GameStates gameState)
 	{
 		try
 		{
