@@ -17,12 +17,12 @@ public class MainActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-		Log.d(logtag,"onCreate started");
+		//Log.d(logtag,"onCreate started");
 		if (!isTaskRoot ()) {
 			Intent intent = getIntent();
 			String action = intent.getAction();
 			if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && action != null && action.equals(Intent.ACTION_MAIN)) {
-				Log.d(logtag,"not root task and blabla - finish");
+				//Log.d(logtag,"not root task and blabla - finish");
 				finish();
 				return;
 			}
@@ -35,14 +35,14 @@ public class MainActivity extends Activity
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		
-		Log.d(logtag,"onCreate ended");
+		//Log.d(logtag,"onCreate ended");
     }
 
 	@Override
 	protected void onDestroy()
 	{
-		Log.d(logtag,"onDestroy started");
-		Log.d(logtag,"onDestroy ended");
+		//Log.d(logtag,"onDestroy started");
+		//Log.d(logtag,"onDestroy ended");
 		super.onDestroy();
 	}
 }

@@ -64,12 +64,12 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	public MySurfaceView(Context context)
 	{
 		super(context);
-		Log.d(MainActivity.logtag, "MySurfaceView constructor started");
+		//Log.d(MainActivity.logtag, "MySurfaceView constructor started");
 		getHolder().addCallback(this);
 		setFocusable(true);	
 		this.context = context;
 		mt = new MainThread(this);
-		Log.d(MainActivity.logtag, "MySurfaceView constructor ended");
+		//Log.d(MainActivity.logtag, "MySurfaceView constructor ended");
 	}
 
 	@Override
@@ -80,43 +80,44 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			player = MediaPlayer.create(context, R.raw.intro);
 			player.start();
 		}
-		Log.d(MainActivity.logtag, "surfaceCreated started");
+		//Log.d(MainActivity.logtag, "surfaceCreated started");
 		setMatrix();
 		if (mt != null)
 		{
 			if (mt.getState() == Thread.State.TERMINATED)
 			{
-				Log.d(MainActivity.logtag, "mainThread state is 'terminated'. Creating new thread.");
+				//Log.d(MainActivity.logtag, "mainThread state is 'terminated'. Creating new thread.");
 				mt = new MainThread(this);
 			}
-			Log.d(MainActivity.logtag, "mainThread starting");
+			//Log.d(MainActivity.logtag, "mainThread starting");
 			mt.start();
 		}
 		else
 		{
-			Log.d(MainActivity.logtag, "mainThread is null, nothing to do?");
+			//Log.d(MainActivity.logtag, "mainThread is null, nothing to do?");
 		}
 
-		Log.d(MainActivity.logtag, "surfaceCreated ended");
+		//Log.d(MainActivity.logtag, "surfaceCreated ended");
 	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder p1, int p2, int p3, int p4)
 	{
-		Log.d(MainActivity.logtag, "surfaceChanged started");
+		//Log.d(MainActivity.logtag, "surfaceChanged started");
 		setMatrix();
-		Log.d(MainActivity.logtag, "surfaceChanged ended");
+		//Log.d(MainActivity.logtag, "surfaceChanged ended");
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder p1)
 	{
-		gameState = GameStates.paused;
+		if (gameState == GameStates.on)
+			gameState = GameStates.paused;
 		if (player != null)
 		{
 			player.pause();
 		}
-		Log.d(MainActivity.logtag, "surfaceDestroyed started");
+		//Log.d(MainActivity.logtag, "surfaceDestroyed started");
 		mt.stopRunning();
 		try
 		{
@@ -125,7 +126,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		catch (InterruptedException e)
 		{}
 		hs.write();
-		Log.d(MainActivity.logtag, "surfaceDestroyed ended");
+		//Log.d(MainActivity.logtag, "surfaceDestroyed ended");
 	}
 
 	void drawGameAreaStart()
