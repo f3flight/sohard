@@ -1,8 +1,9 @@
 package ru.freeflight.sohardnew;
 
 import android.graphics.*;
-import android.util.*;
+import android.media.*;
 import java.util.*;
+import ru.freeflight.sohardnew.*;
 
 public class GateList extends ArrayList
 {
@@ -12,12 +13,16 @@ public class GateList extends ArrayList
 	Iterator iter;
 	Gate currentGate;
 	Paint debugPaint = new Paint();
+	MediaPlayer hiplayer,loplayer;
+	boolean isHi = false;
 	
 	public GateList(MySurfaceView msv)
 	{
 		super();
 		this.msv = msv;
 		debugPaint.setColor(Color.RED);
+		hiplayer = MediaPlayer.create(msv.context, R.raw.hi);
+		loplayer = MediaPlayer.create(msv.context, R.raw.lo);
 	}
 
 	public void addGate()
@@ -49,7 +54,14 @@ public class GateList extends ArrayList
 			currentGate = (Gate) iter.next();
 			currentGate.move(deltaMove);
 			if (currentGate.getBonus(msv.birdVertPos))
+			{
 				msv.score = msv.score + 1;
+				if (isHi)
+					hiplayer.start();
+				else
+					loplayer.start();
+				isHi = !isHi;
+			}
 			if (currentGate.pos + currentGate.length < 0)
 			{
 				msv.speedUp(currentGate.length);
