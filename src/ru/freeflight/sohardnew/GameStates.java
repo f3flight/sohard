@@ -6,6 +6,7 @@ import java.io.*;
 public enum GameStates
 {
 	start,
+	startPaused,
 	settings,
 	on,
 	paused,

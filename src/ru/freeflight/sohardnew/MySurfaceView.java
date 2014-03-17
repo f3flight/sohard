@@ -79,7 +79,13 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		{
 			player = MediaPlayer.create(context, R.raw.intro);
 			player.start();
+		} else
+		if (gameState == GameStates.startPaused)
+		{
+			player.start();
+			gameState = GameStates.start;
 		}
+			
 		//Log.d(MainActivity.logtag, "surfaceCreated started");
 		setMatrix();
 		if (mt != null)
@@ -113,6 +119,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	{
 		if (gameState == GameStates.on)
 			gameState = GameStates.paused;
+		if (gameState == GameStates.start)
+			gameState = GameStates.startPaused;
 		if (player != null)
 		{
 			player.pause();
@@ -201,8 +209,9 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				miniCanvas.drawRect(miniWidth/2-miniWidth/4,miniHeight/2-miniHeight/4,miniWidth/2-miniWidth/10,miniHeight/2+miniHeight/3,miniPaint);
 				miniCanvas.drawRect(miniWidth/2+miniWidth/10,miniHeight/2-miniHeight/4,miniWidth/2+miniWidth/4,miniHeight/2+miniHeight/3,miniPaint);
 				break;
-				
+			
 			case over:
+			case overStage2:
 				drawGameAreaDead();
 				break;
 		}
