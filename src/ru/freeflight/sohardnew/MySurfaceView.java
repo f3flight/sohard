@@ -15,7 +15,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 	public static Context context;
 	MainThread mt;
-	Bitmap miniScreen;
+	Bitmap miniScreen, settingsBitmap;
 	Rect miniRect = new Rect(), screenRect = new Rect();
 	Canvas miniCanvas, screenCanvas;
 	Paint miniPaint = new Paint();
@@ -70,6 +70,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		this.context = context;
 		mt = new MainThread(this);
 		//Log.d(MainActivity.logtag, "MySurfaceView constructor ended");
+		settingsBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wrench);
 	}
 
 	@Override
@@ -153,6 +154,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			miniCanvas.drawText("START", (int)(miniHeight * 0.5F), (int)(miniHeight * 0.25 + 0.5 * miniPaint.getTextSize()), miniPaint);
 			miniPaint.setTextAlign(Paint.Align.LEFT);
 		}
+		miniCanvas.drawBitmap(settingsBitmap,(miniWidth-settingsBitmap.getWidth())/2,miniHeight/2+1,null);
 		hs.Draw(miniCanvas, miniPaint);
 	}
 	
