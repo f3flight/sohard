@@ -10,6 +10,7 @@ import android.media.*;
 
 public class MainActivity extends Activity
 {
+	private static Context context;
 	MySurfaceView msv;
 	public static String logtag = "sohard";
     /** Called when the activity is first created. */
@@ -17,6 +18,7 @@ public class MainActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
+		context = getApplicationContext();
 		//Log.d(logtag,"onCreate started");
 		if (!isTaskRoot ()) {
 			Intent intent = getIntent();
@@ -38,6 +40,11 @@ public class MainActivity extends Activity
 		//Log.d(logtag,"onCreate ended");
     }
 
+	public static Context getContext()
+	{
+		return context;
+	}
+	
 	@Override
 	protected void onDestroy()
 	{

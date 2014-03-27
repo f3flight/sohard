@@ -21,8 +21,8 @@ public class GateList extends ArrayList
 		super();
 		this.msv = msv;
 		debugPaint.setColor(Color.RED);
-		hiplayer = MediaPlayer.create(msv.context, R.raw.hi);
-		loplayer = MediaPlayer.create(msv.context, R.raw.lo);
+		hiplayer = MediaPlayer.create(MainActivity.getContext(), R.raw.hi);
+		loplayer = MediaPlayer.create(MainActivity.getContext(), R.raw.lo);
 	}
 
 	public void addGate()

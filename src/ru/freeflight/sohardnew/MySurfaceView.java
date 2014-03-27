@@ -13,9 +13,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 	public static Random rand = new Random();
 
-	public static Context context;
 	MainThread mt;
-	Bitmap miniScreen, settingsBitmap;
+	Bitmap miniScreen, settingsWrenchBitmap, settingsBitmap, settingsHardBitmap, settingsMuteBitmap;
 	Rect miniRect = new Rect(), screenRect = new Rect();
 	Canvas miniCanvas, screenCanvas;
 	Paint miniPaint = new Paint();
@@ -57,7 +56,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 	//Gate gate2;
 	GateList gateList;
 	Highscore hs;
-	Settings stgs;
+	Settings stgs = new Settings();
 	GameStates gameState;
 	MediaPlayer player;
 
@@ -67,21 +66,23 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		//Log.d(MainActivity.logtag, "MySurfaceView constructor started");
 		getHolder().addCallback(this);
 		setFocusable(true);	
-		this.context = context;
 		mt = new MainThread(this);
 		//Log.d(MainActivity.logtag, "MySurfaceView constructor ended");
-		settingsBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wrench);
+		settingsWrenchBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wrench);
+		settingsBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.settings);
+		settingsHardBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.settings_hard);
+		settingsMuteBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.settings_mute);
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder p1)
 	{
-		if (player == null)
+		if (player == null & !stgs.mute)
 		{
-			player = MediaPlayer.create(context, R.raw.intro);
+			player = MediaPlayer.create(MainActivity.getContext(), R.raw.intro);
 			player.start();
 		} else
-		if (gameState == GameStates.startPaused)
+		if (gameState == GameStates.startPaused & !stgs.mute)
 		{
 			player.start();
 			gameState = GameStates.start;
@@ -151,10 +152,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			miniPaint.setTypeface(Typeface.SERIF);
 			miniPaint.setTextSize(8);
 			miniPaint.setTextAlign(Paint.Align.CENTER);
-			miniCanvas.drawText("START", (int)(miniHeight * 0.5F), (int)(miniHeight * 0.25 + 0.5 * miniPaint.getTextSize()), miniPaint);
+			miniCanvas.drawText("START", (int)(miniWidth * 0.5F), (int)(miniHeight * 0.25 + 0.5 * miniPaint.getTextSize()), miniPaint);
 			miniPaint.setTextAlign(Paint.Align.LEFT);
 		}
-		miniCanvas.drawBitmap(settingsBitmap,(miniWidth-settingsBitmap.getWidth())/2,miniHeight/2+1,null);
+		miniCanvas.drawBitmap(settingsWrenchBitmap,(int)((miniWidth-settingsWrenchBitmap.getWidth())*0.5),(int)(miniHeight*0.75-settingsWrenchBitmap.getHeight()*0.5),null);
 		hs.Draw(miniCanvas, miniPaint);
 	}
 	
@@ -200,6 +201,14 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				drawGameAreaStart();
 				break;
 				
+			case settings:
+				miniCanvas.drawBitmap(settingsBitmap,0,0,null);
+				if (stgs.hard)
+					miniCanvas.drawBitmap(settingsHardBitmap,0,0,null);
+				if (stgs.mute)
+					miniCanvas.drawBitmap(settingsMuteBitmap,0,0,null);
+				break;
+				
 			case on:
 				drawGameAreaAlive();
 				break;
@@ -226,7 +235,7 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		canvas.drawBitmap(miniScreen, miniRect, miniRect, null);
 		canvas.setMatrix(null);
 		//gateList.debugDraw(canvas);
-		if (gameState == GameStates.on | gameState == GameStates.paused)
+		if (!stgs.hard & (gameState == GameStates.on | gameState == GameStates.paused))
 		{
 			miniPaint.setColor(Color.WHITE);
 			miniPaint.setAlpha(80);
@@ -271,11 +280,33 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 		switch (gameState)
 		{
 			case start:
-				gameState = GameStates.on;
-				time = SystemClock.uptimeMillis() / 1000D;
-				player = MediaPlayer.create(context, R.raw.theme);
-				player.setLooping(true);
-				player.start();
+				if (event.getY()<=getHeight()*0.5)
+				{
+					gameState = GameStates.on;
+					time = SystemClock.uptimeMillis() / 1000D;
+					if (!stgs.mute)
+					{
+						player = MediaPlayer.create(MainActivity.getContext(), R.raw.theme);
+						player.setLooping(true);
+						player.start();
+					}
+				} else
+				{
+					gameState = GameStates.settings;
+				}
+				break;
+				
+			case settings:
+				if (event.getY()<(getHeight()-miniHeight*miniZoom)/2 | event.getY()>(getHeight()+miniHeight*miniZoom)/2)
+					gameState = GameStates.start;
+				else
+				{
+					if(event.getY()<getHeight()/2)
+						stgs.hard = !stgs.hard;
+					else
+						stgs.mute = !stgs.mute;
+					stgs.writeSettings();
+				}
 				break;
 			
 			case on:
@@ -284,7 +315,8 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			
 			case paused:
 				gameState = GameStates.on;
-				player.start();
+				if (!stgs.mute)
+					player.start();
 				break;
 				
 			//case over:
@@ -299,9 +331,12 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				catch (InterruptedException e)
 				{}
 				init();
-				player = MediaPlayer.create(context, R.raw.theme);
-				player.setLooping(true);
-				player.start();
+				if (!stgs.mute)
+				{
+					player = MediaPlayer.create(MainActivity.getContext(), R.raw.theme);
+					player.setLooping(true);
+					player.start();
+				}
 				mt = new MainThread(this);
 				mt.start();
 				break;
@@ -323,7 +358,6 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			hs = new Highscore();
 			init();
 			
-			stgs = new Settings();
 			gameState = GameStates.loadGameState();
 			
 			gameInitialized = true;
@@ -389,8 +423,11 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 			player.setLooping(false);
 			player.stop();
 		}
-		player = MediaPlayer.create(context, R.raw.hit);
-		player.start();
+		if (!stgs.mute)
+		{
+			player = MediaPlayer.create(MainActivity.getContext(), R.raw.hit);
+			player.start();
+		}
 		if (hs.getHighscore() < score)
 		{
 			hs.setHighscore(score);

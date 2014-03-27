@@ -18,7 +18,7 @@ public enum GameStates
 		GameStates gameState = GameStates.start;
 		try
 		{
-			FileInputStream f = MySurfaceView.context.openFileInput("gamestate.ser");
+			FileInputStream f = MainActivity.getContext().openFileInput("gamestate.ser");
 			if (f != null)
 			{
 				try
@@ -57,7 +57,7 @@ public enum GameStates
 	{
 		try
 		{
-			FileOutputStream f = MySurfaceView.context.openFileOutput("gamestate.ser", Context.MODE_PRIVATE);
+			FileOutputStream f = MainActivity.getContext().openFileOutput("gamestate.ser", Context.MODE_PRIVATE);
 			try
 			{
 				ObjectOutputStream oos = new ObjectOutputStream(f);

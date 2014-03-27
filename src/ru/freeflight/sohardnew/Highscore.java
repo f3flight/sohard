@@ -16,7 +16,7 @@ public class Highscore
 		{
 			try
 			{
-				FileInputStream f = MySurfaceView.context.openFileInput("hs.ser");
+				FileInputStream f = MainActivity.getContext().openFileInput("hs.ser");
 				if (f != null)
 				{
 
@@ -55,7 +55,7 @@ public class Highscore
 		{
 			try
 			{
-				FileOutputStream f = MySurfaceView.context.openFileOutput("hs.ser", Context.MODE_PRIVATE);
+				FileOutputStream f = MainActivity.getContext().openFileOutput("hs.ser", Context.MODE_PRIVATE);
 				try
 				{
 					ObjectOutputStream oos = new ObjectOutputStream(f);

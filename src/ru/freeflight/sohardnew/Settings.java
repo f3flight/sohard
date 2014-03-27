@@ -1,6 +1,7 @@
 package ru.freeflight.sohardnew;
 
 import android.content.*;
+//import android.util.*;
 import java.io.*;
 
 public class Settings
@@ -12,7 +13,7 @@ public class Settings
 	{
 		try
 		{
-			FileInputStream f = MySurfaceView.context.openFileInput("settings.ser");
+			FileInputStream f = MainActivity.getContext().openFileInput("settings.ser");
 			if (f != null)
 			{
 				try
@@ -85,24 +86,32 @@ public class Settings
 	{
 		try
 		{
-			FileOutputStream f = MySurfaceView.context.openFileOutput("settings.ser", Context.MODE_PRIVATE);
+			//Log.d("sohard","fileoutputstream f");
+			FileOutputStream f = MainActivity.getContext().openFileOutput("settings.ser", Context.MODE_PRIVATE);
 			try
 			{
+				//Log.d("sohard","oos");
 				ObjectOutputStream oos = new ObjectOutputStream(f);
 				oos.writeBoolean(mute);
 				oos.writeBoolean(hard);
 				oos.close();
 			}
 			catch (IOException e)
-			{}
+			{
+				//Log.d("sohard","oos close "+e.getLocalizedMessage());
+			}
 			try
 			{
 				f.close();
 			}
 			catch (IOException e)
-			{}
+			{
+				//Log.d("sohard","f close "+e.getLocalizedMessage());
+			}
 		}
 		catch (FileNotFoundException e)
-		{}
+		{
+			//Log.d("sohard","f openFileOutput "+e.getLocalizedMessage());
+		}
 	}
 }
