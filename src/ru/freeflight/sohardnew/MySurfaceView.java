@@ -496,8 +496,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 						{
 							birdVelocity = birdVelocity + birdGravity * deltaTime;
 							birdDoublePos = birdDoublePos + birdVelocity * deltaTime;
-							if (Math.abs(birdVertPos - birdDoublePos) > 1)
+							if (!stgs.hard & Math.abs(birdVertPos - birdDoublePos) > 1)
 								birdVertPos = (birdDoublePos > birdVertPos) ? (int) Math.floor(birdDoublePos) : (int) Math.floor(birdDoublePos) + 1;
+							else
+								birdVertPos = (int) Math.floor(birdDoublePos);
 							gateList.move(gateSpeed * deltaTime);	
 						}
 
