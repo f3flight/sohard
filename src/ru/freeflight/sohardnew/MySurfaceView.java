@@ -297,7 +297,10 @@ public class MySurfaceView extends SurfaceView implements SurfaceHolder.Callback
 				break;
 				
 			case settings:
-				if (event.getY()<(getHeight()-miniHeight*miniZoom)/2 | event.getY()>(getHeight()+miniHeight*miniZoom)/2)
+				if (  event.getY()<(getHeight()-miniHeight*miniZoom)/2
+				    | event.getY()>(getHeight()+miniHeight*miniZoom)/2
+					| event.getX()>(getWidth()-miniWidth*miniZoom)/2
+					| event.getX()<(getWidth()+miniWidth*miniZoom)/2)
 					gameState = GameStates.start;
 				else
 				{
